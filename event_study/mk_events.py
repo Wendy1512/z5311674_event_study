@@ -7,7 +7,6 @@ import pandas as pd
 import event_study.config as cfg
 
 
-#   Functions to process recommendations into events
 def mk_event_df(tic):
     """ Subsets and processes recommendations given a ticker and return a data
     frame with all events in the sample.
@@ -43,52 +42,28 @@ def mk_event_df(tic):
 
     """
 
-    # ------------------------------------------------------------------------
-    # Step 1. Read the appropriate CSV file with recommendations into a data
-    # frame
-    # ------------------------------------------------------------------------
-    # Read the source file, set the column 'Date' as a DatetimeIndex
+    # Step 1
     pth = cfg.csv_locs(tic)['rec_csv']
     df = pd.read_csv(pth, index_col='Date', parse_dates=['Date'])
-
-    # Standardise column names and keep only the columns of interest
+    # Standardise column names
     cols = ['firm', 'action']
     df = cfg.standardise_colnames(df)[cols]
 
-    # ------------------------------------------------------------------------
-    # Step 2. Create variables identifying the firm and the event date
-    # ------------------------------------------------------------------------
-    # Replace the values of the column "firm" with their upper case version
-    # Alternative: df.loc[:, 'firm'] = [x.upper() for x in df.loc[:, 'firm']]
+    # Step 2
     df.loc[:, 'firm'] = df.loc[:, 'firm'].str.upper()
-
-    # The column 'firm' is already part of the source data, so we only need to
-    # create the 'event_date' column
     df.loc[:, 'event_date'] = df.index.strftime('%Y-%m-%d')
 
-    # ------------------------------------------------------------------------
-    # Step 3. Deal with multiple recommendations
-    # ------------------------------------------------------------------------
+    # Step 3
     df.sort_index(inplace=True)
     groups = df.groupby(['event_date', 'firm'])
-    # Select the last obs for each group using the GroupBy method `last`
-    # Note: result is a dataframe with a multi-index. The reset_index will convert
-    # these indexes to columns
     df = groups.last().reset_index()
 
-    # ------------------------------------------------------------------------
-    # Step 4. Create a table with all relevant events
-    # ------------------------------------------------------------------------
+    # Step 4
     # 4.1: Subset the "action" column
-    # Note: Either one of these statements will create the boolean series:
-    #   cond = (df['action'] == 'up') | (df['action'] == 'down')
-    #   cond = df.loc[:, 'action'].str.contains('up|down')
     cond = df.loc[:, 'action'].str.contains('up|down')
     df = df.loc[cond]
 
     # 4.2: Create a column with the event type ("downgrade" or "upgrade")
-    # We will create an intermediary function to illustrate the use of the
-    # series method `apply`
     def _mk_et(value):
         """ Converts the string `value` as follows:
             - "down" --> "downgrade"
@@ -105,9 +80,6 @@ def mk_event_df(tic):
     df.loc[:, 'event_type'] = df['action'].apply(_mk_et)
 
     # 4.3 Create the event id index:
-    #   - Reset the index so it becomes 0, 1, ...
-    #   - Add 1 to the index
-    #   - Name the index 'event_id' for future reference
     df.reset_index(inplace=True)
     df.index = df.index + 1
     df.index.name = 'event_id'
