@@ -90,15 +90,6 @@ def load_prc1(tic):
     df = pd.read_csv(pth)
 
     d = {c: c.lower() for c in df.columns}
-    # d = {
-    #   'Date': 'date',
-    #   'Open': 'open',
-    #   'High': 'high',
-    #   'Low': 'low',
-    #   'Close': 'close',
-    #   'Adj Close': 'adj close',
-    #   'Volume': 'volume',
-    #   }
     df = df.rename(columns=d)
     df.info()
 
