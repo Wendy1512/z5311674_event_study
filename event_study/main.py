@@ -51,22 +51,22 @@ def main(tic, update_csv=True):
 
 
     """
-    # Step 1: Download stock price and recommendation data for `tic`
+    # Step 1
     if update_csv is True:
         download.get_data(tic)
     else:
         print("Parameter `update_csv` set to False, skipping downloads...")
 
-    # Step 2: Create a data frame with stock (tic) and market returns
+    # Step 2
     ret_df = mk_rets.mk_ret_df(tic)
 
-    # Step 3: Create a data frame with the events
+    # Step 3
     event_df = mk_events.mk_event_df(tic)
 
-    # Step 4: Calculate CARs for each event
+    # Step 4
     cars_df = mk_cars.mk_cars_df(ret_df, event_df)
 
-    # Step 5: Hypothesis testing using t-statistics
+    # Step 5
     res = test_hypo.calc_tstats(cars_df)
     print(res)
 
