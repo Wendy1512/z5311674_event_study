@@ -34,7 +34,6 @@ def yf_rec_to_csv(tic, pth,
     """
     c = yf.Ticker(tic)
     c.history(start=start, end=end).tz_localize(None)
-    # Make sure we only relevant dates
     if start is not None and end is not None:
         df = c.recommendations.loc[start:end]
     elif start is not None:
@@ -57,10 +56,7 @@ def get_data(tic):
         Ticker
 
     """
-    # Get output paths
     locs = cfg.csv_locs(tic)
-
-    # Download and save prices
     print(f'Downloading prices for {tic}...')
     df = yf.download(tic,
             start=cfg.START,
@@ -71,7 +67,6 @@ def get_data(tic):
     df.to_csv(pth)
     print('Done')
 
-    # Download and save recs
     print(f'Downloading recs for {tic}...')
     yf_rec_to_csv(tic,
             pth=locs['rec_csv'],
