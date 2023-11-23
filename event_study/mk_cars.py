@@ -80,23 +80,17 @@ def calc_car(ser, ret_df, window=2):
 
 
     """
-    # --------------------------------------------------------
-    #   Step 4.1: Expand dates and set 'ret_date' as the new index
-    # --------------------------------------------------------
+    #   Step 4.1
     dates = expand_dates(ser, window=window)
     dates.set_index('ret_date', inplace=True)
-    # --------------------------------------------------------
-    #   Step 4.2: Join stock and market returns returns
-    # --------------------------------------------------------
+
+    #   Step 4.2
     df = dates.join(ret_df, how='inner')
-    # --------------------------------------------------------
-    #   Step 4.3: Compute abnormal returns
-    # --------------------------------------------------------
+    
+    #   Step 4.3
     df.loc[:, 'aret'] = df.loc[:, 'ret'] - df.loc[:, 'mkt']
-    # --------------------------------------------------------
-    #   Step 4.4: Sum abnormal returns
-    # --------------------------------------------------------
-    # If df is empty, return np.nan
+
+    #   Step 4.4
     if len(df) == 0:
         return np.nan
     else:
@@ -217,7 +211,6 @@ def _test_mk_cars_df(sample_only=False):
         """ Creates an event df to be used if sample_only is True
         """
         cond = (event_df.event_date == '2020-09-23') & (event_df.firm == 'DEUTSCHE BANK')
-        # The slice is so it returns a DF (not a series)
         event_df = event_df.loc[cond]
         event_df.index = [1]
         event_df.index.name = 'event_id'
@@ -228,7 +221,7 @@ def _test_mk_cars_df(sample_only=False):
     ret_df = mk_rets.mk_ret_df(tic)
     event_df = mk_events.mk_event_df(tic)
 
-    # Sample only?
+    # Sample only
     if sample_only is True:
         event_df = _mk_example_event_df(event_df)
         ret_df = ret_df.loc['2020-09-21':'2020-09-25']
@@ -245,7 +238,7 @@ def _test_mk_cars_df(sample_only=False):
     print(ret_df)
     print('')
 
-    # Create the CAR df
+    # Create the CAR
     cars_df = mk_cars_df(ret_df=ret_df, event_df=event_df)
 
     print('-----------------------------')
