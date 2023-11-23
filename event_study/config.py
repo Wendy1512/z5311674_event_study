@@ -62,16 +62,8 @@ def standardise_colnames(df):
     """
     cols = set(df.columns)
 
-    # You can define `local` functions
     def _parse_name(colname):
-        # Processes the column name
         new_name = colname.lower().replace(' ', '_')
-        # Decide what to do. The options are:
-        # 1) column name is already properly formatted:
-        #   => do nothing
-        # 2) column name is not properly formatted but exists in the dataframe
-        #   => Include '_' prefix
-        # 3) Else: return formatted name
         if new_name == colname:
             # Returns original column
             return colname
